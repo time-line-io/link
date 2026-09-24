@@ -28,6 +28,7 @@ set(link_audio_test_SOURCES
 )
 
 set(link_discovery_test_SOURCES
+  ableton/discovery/tst_IpInterface.cpp
   ableton/discovery/tst_InterfaceScanner.cpp
   ableton/discovery/tst_NetworkByteStreamSerializable.cpp
   ableton/discovery/tst_Payload.cpp
