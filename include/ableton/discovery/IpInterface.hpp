@@ -35,7 +35,11 @@ inline UdpEndpoint multicastEndpointV4()
 inline UdpEndpoint multicastEndpointV6(uint64_t scopeId)
 {
   // This is a non-permanently-assigned link-local multicast address (RFC4291)
-  return {makeAddress("ff12::8080%" + std::to_string(scopeId)), 20808};
+  auto address = makeAddress("ff12::8080").to_v6();
+  // The scope is already an index. Parsing "%<index>" asks Asio to resolve it
+  // as an interface name first, which can trigger module loading on Linux.
+  address.scope_id(scopeId);
+  return {address, 20808};
 }
 
 // Type tags for dispatching between unicast and multicast packets
