@@ -146,9 +146,6 @@ add_executable(LinkDiscoveryTest
   ${link_test_SOURCES}
 )
 configure_link_test_executable(LinkDiscoveryTest)
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  target_link_options(LinkDiscoveryTest PRIVATE "-Wl,--wrap=if_nametoindex")
-endif()
 
 add_executable(LinkAudioTest
   ${link_discovery_HEADERS}
