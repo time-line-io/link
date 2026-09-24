@@ -20,6 +20,20 @@
 #include <ableton/discovery/IpInterface.hpp>
 #include <ableton/test/CatchWrapper.hpp>
 
+#if defined(__linux__)
+#include <atomic>
+namespace
+{
+std::atomic<unsigned int> interfaceNameLookups{0};
+}
+extern "C" unsigned int __real_if_nametoindex(const char* name);
+extern "C" unsigned int __wrap_if_nametoindex(const char* name)
+{
+  ++interfaceNameLookups;
+  return __real_if_nametoindex(name);
+}
+#endif
+
 namespace ableton
 {
 namespace discovery
@@ -29,7 +43,13 @@ TEST_CASE("IPv6 multicast endpoint retains its numeric scope")
 {
   for (const auto scope : {uint64_t{0}, uint64_t{2}, uint64_t{0xffffffff}})
   {
+#if defined(__linux__)
+    const auto lookupsBefore = interfaceNameLookups.load();
+#endif
     const auto endpoint = multicastEndpointV6(scope);
+#if defined(__linux__)
+    CHECK(interfaceNameLookups.load() == lookupsBefore);
+#endif
     const auto address = endpoint.address().to_v6();
     CHECK(address.scope_id() == scope);
     CHECK(address.to_bytes() == makeAddress("ff12::8080").to_v6().to_bytes());
